@@ -2,7 +2,7 @@
 
 Simple weather forecasting example using jsonp and OpenWeatherMap API
 
-* `git clone git@github.com:adjavaherian/makerbot.git`
+* `git clone git@github.com:adjavaherian/weather_forecast.git`
 * `cd weather_forecast`
 * `npm install && npm start`
 
