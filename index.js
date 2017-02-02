@@ -7,6 +7,6 @@ app.use(express.static(__dirname + '/public', {
   extensions: ['html']
 }));
 
-app.listen(8888, function () {
+app.listen(process.env.PORT || 8888, function () {
   console.log('App listening at http://localhost:8888.')
 });
