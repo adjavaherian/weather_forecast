@@ -7,4 +7,4 @@ Simple weather forecasting example using jsonp and OpenWeatherMap API
 * `npm install && npm start`
 
 * [http://localhost:8888](http://localhost:8888)
-* [http://weather-forecast-rulz.herokuapp.com/](Example on Heroku)
+* [Example at Heroku](http://weather-forecast-rulz.herokuapp.com/)
