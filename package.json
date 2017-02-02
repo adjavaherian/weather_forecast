@@ -1,0 +1,23 @@
+{
+  "name": "weather_forecast",
+  "version": "1.0.0",
+  "description": "weather forecast example",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm test",
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/adjavaherian/weather-forecast.git"
+  },
+  "author": "@adjavaherian",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/adjavaherian/weather-forecast/issues"
+  },
+  "homepage": "https://github.com/adjavaherian/weather-forecast#readme",
+  "dependencies": {
+    "express": "^4.14.0"
+  }
+}

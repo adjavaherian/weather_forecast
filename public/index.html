@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Five Day Forecast</title>
+  <link href='https://fonts.googleapis.com/css?family=Amatic+SC' rel='stylesheet' type='text/css'>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+</head>
+<body>
+  <style>
+    html {
+      box-sizing: border-box;
+      background:#ffc600;
+      font-family:'helvetica neue';
+      font-size: 20px;
+      font-weight: 200;
+    }
+    body {
+      margin: 0;
+    }
+    *, *:before, *:after {
+      box-sizing: inherit;
+    }
+
+    .panels {
+      min-height:100vh;
+      overflow: hidden;
+      display: flex;
+    }
+
+    .panel {
+      background:#6B0F9C;
+      box-shadow:inset 0 0 0 5px rgba(255,255,255,0.1);
+      color:white;
+      text-align: center;
+      align-items:center;
+      /* Safari transitionend event.propertyName === flex */
+      /* Chrome + FF transitionend event.propertyName === flex-grow */
+      transition:
+        font-size 0.7s cubic-bezier(0.61,-0.19, 0.7,-0.11),
+        flex 0.7s cubic-bezier(0.61,-0.19, 0.7,-0.11),
+        background 0.2s;
+      font-size: 20px;
+      background-size:cover;
+      background-position:center;
+      flex: 1;
+      justify-content: center;
+      align-items: center;
+      display: flex;
+      flex-direction: column;
+    }
+
+
+    .panel1 { background-image:url(https://source.unsplash.com/gYl-UtwNg_I/1500x1500); }
+    .panel2 { background-image:url(https://source.unsplash.com/93g2k8D1Mi8/1500x1500); }
+    .panel3 { background-image:url(https://source.unsplash.com/U5rMrSI7Pn4/1500x1500); }
+    .panel4 { background-image:url(https://source.unsplash.com/2W5LoumSdfw/1500x1500); }
+    .panel5 { background-image:url(https://source.unsplash.com/3MNzGlQM7qs/1500x1500); }
+
+    .panel > * {
+      margin:0;
+      width: 100%;
+      transition:transform 0.5s;
+      flex: 1 0 auto;
+      justify-content: center;
+      align-items: center;
+      display: flex;
+    }
+
+    .panel > *:first-child { transform: translateY(-100%) }
+    .panel.open-active > *:first-child { transform: translateY(0) }
+    .panel > *:last-child { transform: translateY(100%) }
+    .panel.open-active > *:last-child { transform: translateY(0) }
+
+    .panel p {
+      text-transform: uppercase;
+      font-family: 'Amatic SC', cursive;
+      text-shadow:0 0 4px rgba(0, 0, 0, 0.72), 0 0 14px rgba(0, 0, 0, 0.45);
+      font-size: 2em;
+    }
+    .panel p:nth-child(2) {
+      font-size: 4em;
+    }
+
+    .panel.open {
+      font-size:40px;
+      flex: 5;
+    }
+
+    .cta {
+      color:white;
+      text-decoration: none;
+    }
+
+    .bold {
+      font-weight: bold;
+    }
+  </style>
+
+
+  <div class="panels">
+    <div class="panel panel1" data-key="1">
+      <p>Hey</p>
+      <p>Let's</p>
+      <p>Dance</p>
+    </div>
+    <div class="panel panel2" data-key="2">
+      <p>Give</p>
+      <p>Take</p>
+      <p>Receive</p>
+    </div>
+    <div class="panel panel3 bold" data-key="0">
+      <p>Experience</p>
+      <p>It</p>
+      <p>Today</p>
+    </div>
+    <div class="panel panel4" data-key="3">
+      <p>Give</p>
+      <p>All</p>
+      <p>You can</p>
+    </div>
+    <div class="panel panel5" data-key="4">
+      <p>Life</p>
+      <p>In</p>
+      <p>Motion</p>
+    </div>
+  </div>
+
+  <script>
+    let FiveDayForecast = {};
+    const panels = document.querySelectorAll('.panel');
+
+    function toggleOpen() {
+      this.classList.toggle('open');
+    }
+
+    function toggleActive(e) {
+      if (e.propertyName.includes('flex')) {
+        this.classList.toggle('open-active');
+      }
+    }
+
+    function processWeatherJSON(data) {
+
+      const days = FiveDayForecast;
+      const daysOfWeek = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+
+      data.list.forEach((time) => {
+        const dt = time.dt_txt.split(' ')[0];
+        const dow = new Date(dt).getDay();
+        const humanReadable = daysOfWeek[dow];
+        if(!days[humanReadable]) {
+          days[humanReadable] = { 'list': [], 'high': 0, 'low': 0, dow, humanReadable };
+        }
+        days[humanReadable]['list'].push(time)
+      });
+
+      document.dispatchEvent(new Event('forecast_loaded'));
+
+    }
+
+    function getNextFiveDays() {
+
+      Array.prototype.rotate = function(n) {
+        return this.slice(n, this.length).concat(this.slice(0, n));
+      }
+
+      const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+      const now = new Date();
+      return days.rotate(now.getDay()).slice(0, 5);
+
+    }
+
+    function setNextFiveDays(nextFiveDays) {
+
+      panels.forEach(panel => {
+        const high = panel.querySelectorAll('p')[0];
+        const day = panel.querySelectorAll('p')[1];
+        const low = panel.querySelectorAll('p')[2];
+
+        if(nextFiveDays.length) {
+          panel.dataset.dow = nextFiveDays[panel.dataset.key];
+          day.textContent = nextFiveDays[panel.dataset.key];
+        } else {
+          high.textContent = `high: ${nextFiveDays[panel.dataset.dow].high}` || '';
+          low.textContent = `low: ${nextFiveDays[panel.dataset.dow].low}` || '';
+        }
+
+      });
+
+    }
+
+    function setHighLows(fdf) {
+
+      fdf = fdf || {};
+
+      for (let i in fdf) {
+        if (fdf.hasOwnProperty(i)) {
+
+          const list = fdf[i].list;
+          const highAv = list
+                            .reduce((prev, next) => {
+                              return prev += next.main.temp_max;
+                            }, 0) / list.length;
+
+          const lowAv = list
+                            .reduce((prev, next) => {
+                              return prev += next.main.temp_min;
+                            }, 0) / list.length;
+
+          fdf[i].high = Math.ceil(highAv);
+          fdf[i].low = Math.floor(lowAv);
+
+        }
+      }
+      return fdf;
+    }
+
+    $(() => {
+      // on ready, get / set next five days in html
+      setNextFiveDays(getNextFiveDays());
+
+      // set handlers on panels
+      panels.forEach(panel => panel.addEventListener('click', toggleOpen));
+      panels.forEach(panel => panel.addEventListener('transitionend', toggleActive));
+
+      // get the forecast jsonp
+      $.ajax({
+        url: 'http://api.openweathermap.org/data/2.5/forecast',
+        jsonp: 'callback',
+        data: {
+          APPID: 'f47eca999d9d50c2bf3e586ee17a1f45',
+          q: 'New York, us',
+          units: 'imperial'
+        },
+        success: processWeatherJSON
+      });
+
+    });
+
+    // after the forecast is loaded
+    $(document).on('forecast_loaded', () => {
+
+      FiveDayForecast = setHighLows(FiveDayForecast);
+      setNextFiveDays(FiveDayForecast);
+
+    });
+
+  </script>
+
+
+
+</body>
+</html>
